@@ -602,27 +602,3 @@ if __name__ == "__main__":
     else:
         print("Start the page with this command, from this folder:")
         print(r"venv\Scripts\streamlit run main.py")
-
-
-# ── How to read this file ────────────────────────────────────────────────────
-# Read it from top to bottom. The page itself starts at main().
-#
-# 1. draw_sidebar() takes the file and calls index_uploads().
-# 2. index_uploads() calls read_upload(), then split_into_chunks(), then embed_texts().
-#    The vectors are saved on st.session_state.chunks. That list is our tiny vector store.
-#    A bigger app would put those vectors in Qdrant and the job status in PostgreSQL.
-# 3. When you send a question, draw_chat() calls search_chunks().
-#    search_chunks() does three things: cosine similarity, BM25, then fuse_ranks().
-# 4. build_context() swaps in the parent text and stops when the budget is full.
-# 5. stream_answer() sends only that context to Gemini and streams the reply.
-#
-# What a production version splits out of this one file:
-# - FastAPI for the HTTP API
-# - Next.js for the website (this file uses Streamlit instead)
-# - Qdrant for the vectors (this file keeps them in session state)
-# - PostgreSQL + a task queue for retry-safe ingestion (this file indexes on the button click)
-# - Cohere for reranking (the checkbox is a small stand-in)
-# - LangSmith for scoring retrieval and answer quality
-#
-# The idea is the same: find the relevant pieces first, then let the model write
-# from those pieces instead of from the whole document or from memory.
